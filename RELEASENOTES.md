@@ -1,3 +1,6 @@
+### Unreleased
+* Add net8.0 as target
+
 ### 0.7.0 - 2020-05-10
 * Bilinear Transform *~Nico Caprioli*
 * Butterworth Designer and IIR Coefficients *~Nico Caprioli*
