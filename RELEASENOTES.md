@@ -1,4 +1,4 @@
-### Unreleased
+### 0.7.1-alpha.0
 * Add net8.0 as target
 
 ### 0.7.0 - 2020-05-10
