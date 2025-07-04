@@ -116,17 +116,28 @@ Target "Build" (fun _ ->
 
     // Normal Build (without strong name, with certificate signature)
     CleanDirs (!! "src/**/obj/" ++ "src/**/bin/" )
+    printfn " * cleaned directories"
     restoreWeak filteringSolution
+    printfn " * restored packages"
     buildWeak filteringSolution
-    if isWindows && hasBuildParam "sign" then sign fingerprint timeserver filteringSolution
+    printfn " * built solution %s" filteringSolution.SolutionFile
+    if isWindows && hasBuildParam "sign" then
+        sign fingerprint timeserver filteringSolution
+        printfn " * signed solution %s" filteringSolution.SolutionFile
     collectBinaries filteringSolution
+    printfn " * collected binaries from solution %s" filteringSolution.SolutionFile
     zip filteringZipPackage filteringSolution.OutputZipDir filteringSolution.OutputLibDir (fun f -> f.Contains("MathNet.Filtering.") || f.Contains("MathNet.Numerics."))
+    printfn " * zipped solution %s to %s" filteringSolution.SolutionFile filteringZipPackage.Title
     if isWindows then
         packWeak filteringSolution
+        printfn " * packed solution %s to %s" filteringSolution.SolutionFile filteringSolution.OutputNuGetDir
         collectNuGetPackages filteringSolution
+        printfn " * collected NuGet packages from solution %s" filteringSolution.SolutionFile
 
     // NuGet Sign (all or nothing)
-    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver [filteringSolution; filteringStrongNameSolution]
+    if isWindows && hasBuildParam "sign" then
+        signNuGet fingerprint timeserver [filteringSolution; filteringStrongNameSolution]
+        printfn " * signed NuGet packages from solution %s" filteringSolution.SolutionFile
 
     )
 "Prepare" ==> "Build"
@@ -138,23 +149,23 @@ Target "Build" (fun _ ->
 
 let testFiltering framework = test "src/Filtering.Tests" "Filtering.Tests.csproj" framework
 Target "TestFiltering" DoNothing
-Target "TestFilteringCore3.1" (fun _ -> testFiltering "netcoreapp3.1")
+Target "TestFilteringNet8.0" (fun _ -> testFiltering "net8.0")
 Target "TestFilteringNET40" (fun _ -> testFiltering "net40")
 Target "TestFilteringNET45" (fun _ -> testFiltering "net45")
 Target "TestFilteringNET461" (fun _ -> testFiltering "net461")
 Target "TestFilteringNET47"  (fun _ -> testFiltering "net47")
-"Build" ==> "TestFilteringCore3.1" ==> "TestFiltering"
+"Build" ==> "TestFilteringNet8.0" ==> "TestFiltering"
 "Build" =?> ("TestFilteringNET40", isWindows)
 "Build" =?> ("TestFilteringNET45", isWindows)
 "Build" =?> ("TestFilteringNET461", isWindows) ==> "TestFiltering"
 "Build" =?> ("TestFilteringNET47", isWindows)
 let testKalman framework = test "src/Kalman.Tests" "Kalman.Tests.csproj" framework
 Target "TestKalman" DoNothing
-Target "TestKalmanCore3.1" (fun _ -> testKalman "netcoreapp3.1")
+Target "TestKalmanNet8.0" (fun _ -> testKalman "net8.0")
 Target "TestKalmanNET45" (fun _ -> testKalman "net45")
 Target "TestKalmanNET461" (fun _ -> testKalman "net461")
 Target "TestKalmanNET47" (fun _ -> testKalman "net47")
-"Build" ==> "TestKalmanCore3.1" ==> "TestKalman"
+"Build" ==> "TestKalmanNet8.0" ==> "TestKalman"
 "Build" =?> ("TestKalmanNET45", isWindows)
 "Build" =?> ("TestKalmanNET461", isWindows) ==> "TestKalman"
 "Build" =?> ("TestKalmanNET47", isWindows)

@@ -36,7 +36,8 @@ let dotnet workingDir command =
     let properties =
         [
         ]
-    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
+    let suffix = properties |> List.map (fun (name, value) ->
+        sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
     DotNetCli.RunCommand
         (fun c -> { c with WorkingDir = workingDir})
         (command + suffix)
@@ -46,7 +47,8 @@ let dotnetWeak workingDir command =
         [
             yield "StrongName", "False"
         ]
-    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
+    let suffix = properties |> List.map (fun (name, value) ->
+        sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
     DotNetCli.RunCommand
         (fun c -> { c with WorkingDir = workingDir})
         (command + suffix)
@@ -56,7 +58,8 @@ let dotnetStrong workingDir command =
         [
             yield "StrongName", "True"
         ]
-    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
+    let suffix = properties |> List.map (fun (name, value) ->
+        sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
     DotNetCli.RunCommand
         (fun c -> { c with WorkingDir = workingDir})
         (command + suffix)
@@ -310,7 +313,7 @@ let collectNuGetPackages (solution:Solution) =
 // --------------------------------------------------------------------------------------
 
 let test testsDir testsProj framework =
-    dotnet testsDir (sprintf "run -p %s --configuration Release --framework %s --no-restore --no-build" testsProj framework)
+    dotnet testsDir (sprintf "run --project %s --configuration Release --framework %s --no-restore --no-build" testsProj framework)
 
 
 // --------------------------------------------------------------------------------------
